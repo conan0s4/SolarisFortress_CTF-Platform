@@ -1,0 +1,29 @@
+# Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+db.sqlite3
+db.sqlite3-journal
+backend/db.sqlite3
+
+# Environment
+.env
+.env.local
+
+# Media uploads (keep folder, ignore contents in prod)
+media/*
+!media/.gitkeep
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
