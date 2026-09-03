@@ -30,9 +30,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <footer className="footer">
-        SolarisFortress CTF &middot; built for school workshops
-      </footer>
+     
     </div>
   )
 }

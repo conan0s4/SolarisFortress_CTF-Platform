@@ -149,7 +149,7 @@ export default function ProfilePage() {
       <div className="profile-grid">
         <section className="card profile-card">
           <div className="profile-avatar">
-            {(user?.username || '?').charAt(0).toUpperCase()}
+            {(user?. username || '?').charAt(0).toUpperCase()}
           </div>
 
           <div className="profile-identity">

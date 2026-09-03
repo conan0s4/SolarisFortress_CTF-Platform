@@ -57,7 +57,6 @@ class ChallengeDetailSerializer(serializers.ModelSerializer):
             "files",
             "solved",
         )
-        # NOTE: `flag` is intentionally NOT included.
 
     def get_solved(self, obj):
         request = self.context.get("request")

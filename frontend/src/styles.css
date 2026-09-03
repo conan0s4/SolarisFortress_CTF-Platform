@@ -22,16 +22,20 @@ body,
 #root {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
+  width: 100%;
 }
+
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
-  background-image:
-    url('./images/gme.jpg');
+
+  /* Background image */
+  background-image: url('./images/gme.jpg');
   background-size: cover;
   background-position: center;
-  background-repeat: repeat-inline;
+  background-repeat: no-repeat;
   background-attachment: fixed;
+
   color: var(--text);
   min-height: 100vh;
 }
@@ -40,6 +44,7 @@ a {
   color: var(--link);
   text-decoration: none;
 }
+
 a:hover {
   text-decoration: underline;
 }
@@ -50,7 +55,10 @@ a:hover {
   flex-direction: column;
 }
 
-/* Navbar */
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
 .navbar {
   display: flex;
   align-items: center;
@@ -60,39 +68,47 @@ a:hover {
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(6px);
 }
+
 .navbar .brand {
   font-weight: 700;
   font-size: 1.15rem;
   color: #4ade80;
   letter-spacing: 0.5px;
 }
+
 .navbar .brand .sub {
   color: var(--muted);
   font-weight: 400;
   margin-left: 0.4rem;
   font-size: 0.85rem;
 }
+
 .navbar nav {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
 }
+
 .navbar nav a {
   color: var(--text);
   padding: 0.35rem 0.6rem;
   border-radius: 6px;
 }
+
 .navbar nav a.active {
   background: var(--panel);
   color: #4ade80;
 }
+
 .navbar .spacer {
   flex: 1;
 }
+
 .navbar .user {
   color: var(--muted);
   font-size: 0.9rem;
 }
+
 .navbar button.linkish {
   background: none;
   border: 1px solid var(--border);
@@ -101,12 +117,16 @@ a:hover {
   border-radius: 6px;
   cursor: pointer;
 }
+
 .navbar button.linkish:hover {
   border-color: #4ade80;
   color: #4ade80;
 }
 
-/* Main container */
+/* =========================================================
+   GENERAL
+   ========================================================= */
+
 .container {
   flex: 1;
   max-width: 1100px;
@@ -115,26 +135,42 @@ a:hover {
   padding: 1.5rem;
 }
 
-/* Cards / panels */
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.25rem;
 }
+
 .card + .card {
   margin-top: 1rem;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin-top: 0;
 }
-h1 { font-size: 1.6rem; }
-h2 { font-size: 1.25rem; color: #4ade80; }
-h3 { font-size: 1.05rem; }
 
-/* Buttons */
-button, .btn {
+h1 {
+  font-size: 1.6rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  color: #4ade80;
+}
+
+h3 {
+  font-size: 1.05rem;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+button,
+.btn {
   background: linear-gradient(180deg, greenyellow);
   color: #1b1206;
   font-weight: 700;
@@ -144,23 +180,30 @@ button, .btn {
   cursor: pointer;
   font-size: 0.95rem;
 }
-button.secondary, .btn.secondary {
+
+button.secondary,
+.btn.secondary {
   background: var(--bg-2);
   color: var(--text);
   border: 1px solid var(--border);
 }
+
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Forms */
+/* =========================================================
+   FORM
+   ========================================================= */
+
 .form {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
   max-width: 360px;
 }
+
 .form label {
   display: flex;
   flex-direction: column;
@@ -168,6 +211,7 @@ button:disabled {
   font-size: 0.9rem;
   color: var(--muted);
 }
+
 .form input[type="text"],
 .form input[type="password"],
 .form input[type="email"],
@@ -180,11 +224,16 @@ button:disabled {
   font-size: 1rem;
   outline: none;
 }
+
 .form input:focus {
   border-color: #4ade80;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.08);
 }
 
-/* Messages */
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
 .error {
   background: rgba(248, 113, 113, 0.12);
   border: 1px solid rgba(248, 113, 113, 0.4);
@@ -192,6 +241,7 @@ button:disabled {
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
 }
+
 .success {
   background: rgba(74, 222, 128, 0.12);
   border: 1px solid rgba(74, 222, 128, 0.4);
@@ -199,143 +249,801 @@ button:disabled {
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
 }
+
 .muted {
   color: var(--muted);
 }
 
-/* Challenge list */
-.challenge-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
+/* =========================================================
+   AUTH PAGE
+   ========================================================= */
+
+.auth-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
 }
-.challenge-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem;
+
+/*
+===========================================================
+FULL PAGE DARK TRANSPARENT OVERLAY
+===========================================================
+
+This covers the ENTIRE viewport.
+
+The background image remains visible underneath it.
+
+0.45 = 45% opacity.
+Increase it for a darker page.
+Decrease it for a brighter image.
+*/
+
+.auth-page::before {
+  content: "";
+
+  position: fixed;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(5, 10, 20, 0.45);
+
+  z-index: 1;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   START SCREEN
+   ========================================================= */
+
+.start-screen {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  animation: startFadeIn 0.8s ease;
+}
+
+.start-content {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  transition: transform 0.1s ease, border-color 0.1s ease;
+  align-items: center;
+  justify-content: center;
+
+  gap: 1rem;
+
+  padding: 2rem;
 }
+
+.game-title {
+  margin-bottom: 1rem;
+
+  animation: titleFloat 3s ease-in-out infinite;
+}
+
+.game-title-main {
+  color: #4ade80;
+
+  font-size: clamp(2rem, 5vw, 4rem);
+
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+
+  text-shadow:
+    0 0 10px rgba(74, 222, 128, 0.45),
+    0 0 30px rgba(74, 222, 128, 0.2);
+}
+
+.game-title-sub {
+  color: var(--muted);
+
+  font-size: 0.85rem;
+
+  letter-spacing: 0.45em;
+
+  margin-top: 0.45rem;
+}
+
+.terminal-line {
+  color: #4ade80;
+
+  font-family: 'Courier New', monospace;
+
+  font-size: 0.85rem;
+
+  letter-spacing: 0.15em;
+
+  margin-bottom: 1.2rem;
+
+  animation: terminalBlink 1.2s infinite;
+}
+
+.terminal-line span {
+  color: var(--accent);
+}
+
+/* =========================================================
+   PLAY BUTTON
+   ========================================================= */
+
+.play-button {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.8rem;
+
+  min-width: 190px;
+  min-height: 64px;
+
+  padding: 1rem 2.5rem;
+
+  border-radius: 10px;
+
+  /* SOLID BUTTON */
+  background: #4ade80;
+
+  border: 2px solid #4ade80;
+
+  color: #0b1020;
+
+  font-size: 1.25rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.2em;
+
+  cursor: pointer;
+
+  overflow: visible;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.play-button::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -7px;
+
+  border: 1px solid rgba(74, 222, 128, 0.45);
+
+  border-radius: 14px;
+
+  animation: playPulse 2s ease-out infinite;
+
+  pointer-events: none;
+}
+
+.play-button::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -14px;
+
+  border: 1px solid rgba(74, 222, 128, 0.18);
+
+  border-radius: 18px;
+
+  animation: playPulse 2s ease-out infinite 0.6s;
+
+  pointer-events: none;
+}
+
+.play-button:hover {
+  transform: scale(1.06);
+
+  background: #86efac;
+
+  border-color: #86efac;
+
+  color: #07100b;
+
+  box-shadow:
+    0 0 20px rgba(74, 222, 128, 0.4),
+    0 0 50px rgba(74, 222, 128, 0.2);
+}
+
+.play-button:active {
+  transform: scale(0.97);
+}
+
+.play-icon {
+  font-size: 1.15rem;
+
+  animation: playIconPulse 1.5s ease-in-out infinite;
+}
+
+.start-hint {
+  margin-top: 0.8rem;
+
+  color: var(--muted);
+
+  font-family: 'Courier New', monospace;
+
+  font-size: 0.7rem;
+
+  letter-spacing: 0.25em;
+
+  animation: hintBlink 2s ease-in-out infinite;
+}
+
+/* =========================================================
+   LOGIN SCREEN
+   ========================================================= */
+
+.login-screen {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 2rem 1rem;
+
+  animation: loginAppear 0.7s ease forwards;
+}
+
+.login-logo {
+  text-align: center;
+
+  margin-bottom: 1.5rem;
+
+  animation: logoAppear 0.7s ease;
+}
+
+.login-logo-main {
+  color: #4ade80;
+
+  font-size: 1.6rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+
+  text-shadow:
+    0 0 12px rgba(74, 222, 128, 0.3);
+}
+
+.login-logo-sub {
+  color: var(--muted);
+
+  font-size: 0.65rem;
+
+  letter-spacing: 0.35em;
+
+  margin-top: 0.25rem;
+}
+
+/* =========================================================
+   LOGIN CARD
+   ========================================================= */
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+
+  background: rgba(22, 29, 58, 0.94);
+
+  border: 1px solid rgba(74, 222, 128, 0.25);
+
+  border-radius: 12px;
+
+  padding: 1.5rem;
+
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(74, 222, 128, 0.05);
+
+  animation:
+    loginCardAppear
+    0.7s
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-header {
+  margin-bottom: 1.25rem;
+}
+
+.login-terminal {
+  font-family: 'Courier New', monospace;
+
+  font-size: 0.7rem;
+
+  color: #4ade80;
+
+  letter-spacing: 0.15em;
+
+  margin-bottom: 0.6rem;
+}
+
+.login-header h2 {
+  margin-bottom: 0.4rem;
+}
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+.login-button {
+  width: 100%;
+
+  margin-top: 0.3rem;
+
+  padding: 0.75rem;
+
+  /* SOLID BUTTON */
+  background: #4ade80;
+
+  border: 2px solid #4ade80;
+
+  color: #0b1020;
+
+  font-weight: 800;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.login-button:hover {
+  background: #86efac;
+
+  border-color: #86efac;
+
+  color: #07100b;
+
+  box-shadow:
+    0 0 15px rgba(74, 222, 128, 0.35);
+
+  transform: translateY(-1px);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+.login-button:disabled {
+  background: #4ade80;
+
+  border-color: #4ade80;
+
+  color: #0b1020;
+
+  opacity: 0.6;
+}
+
+.register-link {
+  text-align: center;
+
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+}
+
+.login-footer {
+  margin-top: 1.2rem;
+
+  color: var(--muted);
+
+  font-family: 'Courier New', monospace;
+
+  font-size: 0.65rem;
+
+  letter-spacing: 0.15em;
+
+  opacity: 0.7;
+
+  animation: hintBlink 3s ease-in-out infinite;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes startFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes titleFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes terminalBlink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes playPulse {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.8;
+  }
+
+  70% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+}
+
+@keyframes playIconPulse {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes hintBlink {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes loginAppear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes logoAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loginCardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   CHALLENGES
+   ========================================================= */
+
+.challenge-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(260px, 1fr)
+    );
+
+  gap: 1rem;
+}
+
+.challenge-card {
+  background: var(--panel);
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.4rem;
+
+  transition:
+    transform 0.1s ease,
+    border-color 0.1s ease;
+}
+
 .challenge-card:hover {
   transform: translateY(-2px);
+
   border-color: #4ade80;
 }
+
 .challenge-card .row {
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
   gap: 0.5rem;
 }
+
 .challenge-card .category {
   font-size: 0.75rem;
+
   text-transform: uppercase;
+
   letter-spacing: 1px;
+
   color: var(--muted);
 }
+
 .challenge-card .points {
   font-weight: 700;
+
   color: #4ade80;
 }
+
 .challenge-card .name {
   font-weight: 600;
+
   color: var(--text);
+
   font-size: 1.05rem;
 }
+
 .challenge-card .badge {
   display: inline-block;
+
   font-size: 0.75rem;
+
   padding: 0.15rem 0.5rem;
+
   border-radius: 999px;
+
   border: 1px solid var(--border);
+
   color: var(--muted);
 }
+
 .challenge-card .badge.solved {
   background: rgba(74, 222, 128, 0.15);
+
   border-color: rgba(74, 222, 128, 0.5);
+
   color: var(--success);
 }
 
-/* Challenge detail */
+/* =========================================================
+   KEY VALUE
+   ========================================================= */
+
 .kv {
   display: grid;
+
   grid-template-columns: max-content 1fr;
+
   gap: 0.4rem 1rem;
+
   margin: 0.5rem 0 1rem;
 }
+
 .kv dt {
   color: var(--muted);
 }
+
 .kv dd {
   margin: 0;
 }
 
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
 .description {
   white-space: pre-wrap;
+
   background: var(--bg-2);
+
   border: 1px solid var(--border);
+
   padding: 0.9rem 1rem;
+
   border-radius: 8px;
+
   line-height: 1.45;
 }
 
+/* =========================================================
+   FILES
+   ========================================================= */
+
 .files ul {
   list-style: none;
+
   padding: 0;
   margin: 0;
 }
+
 .files li {
   padding: 0.35rem 0;
 }
 
-/* Leaderboard table */
+/* =========================================================
+   LEADERBOARD
+   ========================================================= */
+
 .leaderboard {
   width: 100%;
+
   border-collapse: collapse;
 }
-.leaderboard th, .leaderboard td {
+
+.leaderboard th,
+.leaderboard td {
   padding: 0.55rem 0.75rem;
+
   border-bottom: 1px solid var(--border);
+
   text-align: left;
 }
+
 .leaderboard th {
   color: var(--muted);
+
   font-weight: 600;
+
   text-transform: uppercase;
+
   font-size: 0.75rem;
+
   letter-spacing: 1px;
 }
+
 .leaderboard tr.me td {
   background: rgba(255, 184, 77, 0.07);
 }
 
-/* Auth pages */
-.auth-page {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 3rem;
-}
-.auth-page .card {
-  width: 100%;
-  max-width: 420px;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-  padding: 1rem;
-  border-top: 1px solid var(--border);
-}
+/* =========================================================
+   ROW
+   ========================================================= */
 
 .row {
   display: flex;
+
   gap: 0.75rem;
+
   align-items: center;
+
   flex-wrap: wrap;
 }
-.spacer { flex: 1; }
+
+.spacer {
+  flex: 1;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .game-title-main {
+    font-size: 2rem;
+
+    letter-spacing: 0.1em;
+  }
+
+  .game-title-sub {
+    font-size: 0.65rem;
+
+    letter-spacing: 0.3em;
+  }
+
+  .play-button {
+    min-width: 170px;
+
+    min-height: 58px;
+
+    font-size: 1.05rem;
+  }
+
+  .login-screen {
+    padding: 1.25rem;
+  }
+
+  .login-card {
+    padding: 1.2rem;
+  }
+
+  .login-logo-main {
+    font-size: 1.25rem;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    scroll-behavior: auto !important;
+
+    transition-duration: 0.01ms !important;
+  }
+}
