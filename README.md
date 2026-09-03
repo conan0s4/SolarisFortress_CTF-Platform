@@ -1,3 +1,5 @@
+![rpg](rpg.png)
+
 # SolarisFortress CTF Platform
 
 A minimal but fully functional Capture The Flag (CTF) platform built for small
