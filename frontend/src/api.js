@@ -4,7 +4,8 @@
 // - attaches the token-based Authorization header if logged in
 // - normalizes errors
 
-const API_BASE = '/api'
+const envBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+export const API_BASE = envBase ? (envBase.endsWith('/api') ? envBase : `${envBase}/api`) : '/api'
 
 function getCookie(name) {
   const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]*)'))
@@ -71,10 +72,24 @@ export async function api(path, { method = 'GET', body, headers = {}, signal } =
   }
 
   if (!res.ok) {
-    const message =
-      (data && typeof data === 'object' && (data.detail || data.error)) ||
-      (typeof data === 'string' ? data : '') ||
-      `Request failed (${res.status})`
+    let message = ''
+    if (data && typeof data === 'object') {
+      if (data.detail) {
+        message = data.detail
+      } else if (data.error) {
+        message = data.error
+      } else {
+        const entries = Object.entries(data)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ') : v}`)
+          .filter(Boolean)
+        if (entries.length > 0) message = entries.join(' | ')
+      }
+    } else if (typeof data === 'string') {
+      message = data
+    }
+    if (!message) {
+      message = `Request failed (${res.status})`
+    }
     const err = new Error(message)
     err.status = res.status
     err.data = data

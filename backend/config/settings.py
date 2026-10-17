@@ -1,7 +1,7 @@
 """Django settings for SolarisFortress CTF Platform."""
 from pathlib import Path
 import os
-
+import dj_database_url
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,12 +10,16 @@ PROJECT_ROOT = BASE_DIR.parent
 # Load environment variables from project root .env
 load_dotenv(PROJECT_ROOT / ".env")
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-secret-key")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-secret-key-solaris-fortress-ctf")
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
-ALLOWED_HOSTS = [
-    h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if h.strip()
-]
+
+# Allowed hosts
+_raw_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = [h.strip() for h in _raw_hosts if h.strip()]
+# Include Vercel system host if present
+if "VERCEL_URL" in os.environ:
+    ALLOWED_HOSTS.append(os.environ["VERCEL_URL"])
+    ALLOWED_HOSTS.append(".vercel.app")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -23,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
@@ -33,6 +38,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -60,10 +66,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Database — PostgreSQL via env vars, with SQLite fallback for local dev.
-USE_SQLITE = os.environ.get("USE_SQLITE", "0") == "1"
+# Database Configuration:
+# 1. If DATABASE_URL is provided (Neon, Supabase, Railway, Vercel Postgres), use dj_database_url
+# 2. Else if USE_SQLITE=1, use SQLite
+# 3. Else fallback to individual DB_* env variables
+DATABASE_URL = os.environ.get("DATABASE_URL")
+USE_SQLITE = os.environ.get("USE_SQLITE", "1" if not DATABASE_URL else "0") == "1"
 
-if USE_SQLITE:
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif USE_SQLITE:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -94,8 +112,9 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files (challenge uploads)
 MEDIA_URL = "/media/"
@@ -117,18 +136,23 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS — allow the Vite dev server.
-FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173")
-CORS_ALLOWED_ORIGINS = [FRONTEND_ORIGIN]
+# CORS & CSRF configuration
+_frontend_origins = os.environ.get(
+    "FRONTEND_ORIGIN",
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
+).split(",")
+CORS_ALLOWED_ORIGINS = [orig.strip() for orig in _frontend_origins if orig.strip()]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = [FRONTEND_ORIGIN]
 
-# Login
+CSRF_TRUSTED_ORIGINS = [orig for orig in CORS_ALLOWED_ORIGINS if orig.startswith("http")]
+if "VERCEL_URL" in os.environ:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ['VERCEL_URL']}")
+CSRF_TRUSTED_ORIGINS.extend([
+    "https://*.vercel.app",
+])
+
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/admin/"
-
-# Serve media in development.
-if DEBUG:
-    from django.conf.urls.static import static
-
-    urlpatterns_media = static(MEDIA_URL, document_root=MEDIA_ROOT)

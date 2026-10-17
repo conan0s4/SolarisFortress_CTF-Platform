@@ -30,6 +30,11 @@ export default function Navbar() {
             <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''}>
               Profile
             </NavLink>
+            {user.is_staff && (
+              <NavLink to="/admin" className={({ isActive }) => isActive ? 'active' : ''}>
+                Admin
+              </NavLink>
+            )}
           </nav>
           <div className="spacer" />
           <span className="user">

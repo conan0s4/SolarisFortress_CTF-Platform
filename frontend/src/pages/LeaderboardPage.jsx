@@ -13,7 +13,7 @@ export default function LeaderboardPage() {
     ;(async () => {
       try {
         const data = await api('/leaderboard/')
-        if (!cancelled) setEntries(data)
+        if (!cancelled) setEntries(Array.isArray(data) ? data : (data?.entries || []))
       } catch (err) {
         if (!cancelled) setError(err.message || 'Failed to load leaderboard')
       } finally {

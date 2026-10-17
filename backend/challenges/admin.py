@@ -1,7 +1,16 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Challenge, ChallengeFile, Submission, Solve
+from .models import (
+    Challenge,
+    ChallengeFile,
+    Submission,
+    Solve,
+    CompetitionConfig,
+    Announcement,
+    ScoreAdjustment,
+    AuditLog,
+)
 
 
 class ChallengeFileInline(admin.TabularInline):
@@ -13,8 +22,8 @@ class ChallengeFileInline(admin.TabularInline):
 
 @admin.register(Challenge)
 class ChallengeAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "points", "published", "updated_at")
-    list_filter = ("category", "published", "points")
+    list_display = ("name", "category", "difficulty", "points", "published", "is_archived", "updated_at")
+    list_filter = ("category", "difficulty", "published", "is_archived", "points")
     search_fields = ("name", "description", "flag")
     list_editable = ("published", "points")
     readonly_fields = ("created_at", "updated_at")
@@ -22,13 +31,13 @@ class ChallengeAdmin(admin.ModelAdmin):
         (
             None,
             {
-                "fields": ("name", "category", "points", "published"),
+                "fields": ("name", "category", "difficulty", "points", "published", "is_archived"),
             },
         ),
         (
             "Content",
             {
-                "fields": ("description",),
+                "fields": ("description", "hints"),
             },
         ),
         (
@@ -86,4 +95,40 @@ class SolveAdmin(admin.ModelAdmin):
     readonly_fields = ("user", "challenge", "solved_at")
 
     def has_add_permission(self, request):
+        return False
+
+
+@admin.register(CompetitionConfig)
+class CompetitionConfigAdmin(admin.ModelAdmin):
+    list_display = ("title", "is_active", "scoreboard_frozen", "registration_open", "updated_at")
+
+    def has_add_permission(self, request):
+        return not CompetitionConfig.objects.exists()
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ("title", "is_pinned", "created_at", "created_by")
+    list_filter = ("is_pinned",)
+    search_fields = ("title", "content")
+
+
+@admin.register(ScoreAdjustment)
+class ScoreAdjustmentAdmin(admin.ModelAdmin):
+    list_display = ("user", "points", "reason", "created_by", "created_at", "is_reversed")
+    list_filter = ("is_reversed", "created_at")
+    search_fields = ("user__username", "reason", "created_by__username")
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "actor", "action", "target_type", "target_repr", "ip_address")
+    list_filter = ("action", "target_type", "created_at")
+    search_fields = ("target_repr", "action", "actor__username")
+    readonly_fields = ("created_at", "actor", "action", "target_type", "target_id", "target_repr", "details", "ip_address")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False
