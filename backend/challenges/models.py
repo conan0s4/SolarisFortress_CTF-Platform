@@ -75,7 +75,7 @@ class ChallengeFile(models.Model):
     challenge = models.ForeignKey(
         Challenge, on_delete=models.CASCADE, related_name="files"
     )
-    file = models.FileField(upload_to=challenge_file_path)
+    file = models.FileField(upload_to=challenge_file_path, max_length=500)
     original_name = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

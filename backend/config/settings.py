@@ -124,9 +124,29 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Media files (challenge uploads)
+# Media files (challenge uploads).
+# When a Vercel Blob store is connected (BLOB_READ_WRITE_TOKEN / BLOB_STORE_ID
+# present) uploads persist in Blob; otherwise they use the local filesystem for
+# development. Vercel's serverless filesystem is ephemeral, so Blob is required
+# in production.
+_BLOB_ENABLED = bool(
+    os.environ.get("BLOB_READ_WRITE_TOKEN") or os.environ.get("BLOB_STORE_ID")
+)
+
+STORAGES = {
+    "default": {
+        "BACKEND": (
+            "challenges.storage.VercelBlobStorage"
+            if _BLOB_ENABLED
+            else "django.core.files.storage.FileSystemStorage"
+        ),
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = PROJECT_ROOT / "media"
 

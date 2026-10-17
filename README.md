@@ -70,6 +70,8 @@ Vercel is the required production deployment platform. The project is designed w
                                                                     │
                                                                     ▼
                                                         [ Managed PostgreSQL (Neon / Supabase) ]
+
+[ Challenge File Uploads ] ─────────────────────────► [ Vercel Blob (public store) ]
 ```
 
 The project is configured as a single Vercel **Services** project (`vercel.json`). Two services build independently and share one domain:
@@ -87,6 +89,9 @@ On Vercel, Python Serverless Functions run inside isolated, ephemeral execution 
 - **Multiple concurrent serverless lambdas** cannot share a local SQLite file without data corruption or split-brain discrepancies.
 - **PostgreSQL** is therefore required in production. Managed serverless PostgreSQL providers like **Neon**, **Supabase**, or **Railway** provide persistent, pooled connections via `DATABASE_URL`.
 - Local development retains the lightweight SQLite fallback by setting `USE_SQLITE=1`.
+
+### Challenge File Storage (Vercel Blob)
+The function filesystem is also ephemeral and read-only, so challenge attachments cannot be written to local disk in production. When a **Vercel Blob** store is connected (`BLOB_READ_WRITE_TOKEN` or `BLOB_STORE_ID` present) the platform stores uploads in Blob and serves them from the store's public delivery URL (`challenges.storage.VercelBlobStorage`). When no store is configured, uploads fall back to the local filesystem for development.
 
 ---
 
@@ -258,7 +263,8 @@ Access the admin dashboard by navigating to `/admin` while logged in as a staff 
 2. In the **Vercel Dashboard**, click **Add New Project** and import the repository.
 3. Keep the **Root Directory** as `./` (the repository root) and select the **Services** application preset. The root `vercel.json` defines the `backend` and `frontend` services and their public routing.
 4. **Provision PostgreSQL** (required — Vercel's serverless filesystem is read-only, so SQLite cannot be used). In **Project → Storage**, create a **Neon** database (or connect Neon/Supabase/Railway). This injects `DATABASE_URL` automatically.
-5. In **Project Settings → Environment Variables**, add:
+5. **Provision Vercel Blob** for persistent challenge uploads. In **Project → Storage**, create a **Blob** store with **public** access (or run `vercel blob create-store <name> --access public --yes`). This injects `BLOB_READ_WRITE_TOKEN` automatically.
+6. In **Project Settings → Environment Variables**, add:
    - `DJANGO_SECRET_KEY`: A long, random cryptographic string.
    - `DJANGO_DEBUG`: `False`
    - `DATABASE_URL`: Your managed PostgreSQL connection URL (skip if the Storage integration added it).
@@ -266,7 +272,7 @@ Access the admin dashboard by navigating to `/admin` while logged in as a staff 
    - `FRONTEND_ORIGIN`: Your Vercel deployment URL (e.g. `https://solarisfortress.vercel.app`).
    - `ADMIN_USERNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`: The initial administrator account. The backend build runs `manage.py migrate` and `manage.py bootstrap`, which creates this superuser automatically.
    - `SEED_DEMO`: `1` to also load the demo challenges/config/announcements (optional).
-6. Click **Deploy**. The backend build migrates the schema, provisions the admin, and collects static files; the frontend is served at `/`, and Django handles `/api`, `/django-admin`, `/static`, and `/media`.
+7. Click **Deploy**. The backend build migrates the schema, provisions the admin, and collects static files; the frontend is served at `/`, and Django handles `/api`, `/django-admin`, `/static`, and `/media`.
 
 > **Important:** Without `DATABASE_URL` the build fails on purpose with a clear message. The login error `unable to open database file` means the app fell back to SQLite on the read-only serverless filesystem.
 
