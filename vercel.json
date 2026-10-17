@@ -1,45 +1,39 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "backend": {
+      "root": "backend/",
+      "framework": "django"
     },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+    "frontend": {
+      "root": "frontend/",
+      "framework": "vite",
+      "routes": [
+        { "handle": "filesystem" },
+        { "src": "/(.*)", "dest": "/index.html" }
+      ]
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/index.py"
+      "source": "/api/(.*)",
+      "destination": { "service": "backend" }
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "api/index.py"
+      "source": "/django-admin/(.*)",
+      "destination": { "service": "backend" }
     },
     {
-      "src": "/static/(.*)",
-      "dest": "api/index.py"
+      "source": "/static/(.*)",
+      "destination": { "service": "backend" }
     },
     {
-      "src": "/media/(.*)",
-      "dest": "api/index.py"
+      "source": "/media/(.*)",
+      "destination": { "service": "backend" }
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "frontend/assets/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/index.html"
+      "source": "/(.*)",
+      "destination": { "service": "frontend" }
     }
   ]
 }

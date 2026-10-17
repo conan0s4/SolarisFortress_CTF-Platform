@@ -154,5 +154,5 @@ CSRF_TRUSTED_ORIGINS.extend([
     "https://*.vercel.app",
 ])
 
-LOGIN_URL = "/admin/login/"
-LOGIN_REDIRECT_URL = "/admin/"
+LOGIN_URL = "/django-admin/login/"
+LOGIN_REDIRECT_URL = "/django-admin/"

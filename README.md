@@ -61,16 +61,25 @@ Vercel is the required production deployment platform. The project is designed w
 ```text
 [ Browser / Client ]
         │
-        ├─── Static Assets & React SPA ──────────► [ Vercel Edge CDN (Vite static build) ]
+        ├─── Static Assets & React SPA ──────────► [ Vercel Edge CDN (frontend service · Vite build) ]
         │
-        └─── /api/*, /admin/*, /media/* ────────► [ Vercel Serverless Function (api/index.py) ]
-                                                            │
-                                                            ▼
-                                                    [ Django WSGI App ]
-                                                            │
-                                                            ▼
-                                                [ Managed PostgreSQL (Neon / Supabase) ]
+        └─── /api/*, /django-admin/*, /static/*, /media/* ──► [ Vercel Function (backend service · Django) ]
+                                                                    │
+                                                                    ▼
+                                                            [ Django WSGI App ]
+                                                                    │
+                                                                    ▼
+                                                        [ Managed PostgreSQL (Neon / Supabase) ]
 ```
+
+The project is configured as a single Vercel **Services** project (`vercel.json`). Two services build independently and share one domain:
+
+| Service | Root | Framework | Public paths | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `backend` | `backend/` | Django | `/api/*`, `/django-admin/*`, `/static/*`, `/media/*` | Vercel auto-runs `collectstatic`. |
+| `frontend` | `frontend/` | Vite | everything else (SPA fallback to `/index.html`) | Serves the React app, including the `/admin` dashboard. |
+
+> **Note:** The React admin dashboard owns `/admin`. Django's built-in admin was relocated to `/django-admin/` to avoid the collision. No service bindings are needed: the static frontend reaches the backend through the public `/api` rewrite (bindings only resolve in server-side functions at runtime, not in static builds).
 
 ### Why Vercel Serverless Requires PostgreSQL
 On Vercel, Python Serverless Functions run inside isolated, ephemeral execution environments (AWS Lambda instances) that spin up on demand:
@@ -100,14 +109,12 @@ The project utilizes `dj-database-url` to dynamically switch database engines:
 
 ```text
 SolarisFortress_CTF-Platform/
-├── api/
-│   └── index.py               # Vercel Serverless WSGI entrypoint for Django
-├── backend/
+├── backend/                   # Vercel service: "backend" (Django framework preset)
 │   ├── manage.py
 │   ├── requirements.txt       # Python dependencies
 │   ├── config/                # Django core settings, urls, wsgi/asgi
 │   │   ├── settings.py        # dj-database-url, whitenoise, CORS regex
-│   │   ├── urls.py
+│   │   ├── urls.py            # API + Django built-in admin (/django-admin/)
 │   │   └── wsgi.py
 │   └── challenges/            # CTF Core App
 │       ├── models.py          # Challenge, Solve, ScoreAdjustment, AuditLog, etc.
@@ -117,10 +124,9 @@ SolarisFortress_CTF-Platform/
 │       ├── utils.py           # Authoritative scoring, tie-breaking, audit logging
 │       ├── admin.py           # Django built-in admin configuration
 │       └── tests.py           # Automated test suite
-├── frontend/
+├── frontend/                  # Vercel service: "frontend" (Vite framework preset)
 │   ├── package.json
 │   ├── vite.config.js
-│   ├── vercel.json            # Vercel SPA rewrites for decoupled deployments
 │   └── src/
 │       ├── api.js             # API client with VITE_API_BASE_URL support
 │       ├── App.jsx            # Routing table (Public + Admin routes)
@@ -143,8 +149,7 @@ SolarisFortress_CTF-Platform/
 │               ├── AdminAuditLogsPage.jsx
 │               ├── AdminAnnouncementsPage.jsx
 │               └── AdminExportPage.jsx
-├── vercel.json                # Root Vercel monorepo deployment configuration
-├── requirements.txt           # Root requirements discovery for Vercel Python runtime
+├── vercel.json                # Single-project Vercel Services config (backend + frontend)
 ├── .env.example               # Environment variables template
 └── README.md
 ```
@@ -247,18 +252,18 @@ Access the admin dashboard by navigating to `/admin` while logged in as a staff 
 
 ## Vercel Deployment Guide
 
-### Option 1: Monorepo Deployment (Recommended)
+### Option 1: Services Deployment (Recommended)
 
 1. **Push your repository** to GitHub/GitLab.
 2. In the **Vercel Dashboard**, click **Add New Project** and import the repository.
-3. Keep the **Root Directory** as `./` (the repository root). Vercel detects `vercel.json` automatically.
+3. Keep the **Root Directory** as `./` (the repository root) and select the **Services** application preset. The root `vercel.json` defines the `backend` and `frontend` services and their public routing.
 4. In **Project Settings → Environment Variables**, add:
    - `DJANGO_SECRET_KEY`: A long, random cryptographic string.
    - `DJANGO_DEBUG`: `False`
    - `DATABASE_URL`: Your managed PostgreSQL connection URL (e.g. from Neon or Supabase).
    - `DJANGO_ALLOWED_HOSTS`: `localhost,.vercel.app`
    - `FRONTEND_ORIGIN`: Your Vercel deployment URL (e.g. `https://solarisfortress.vercel.app`).
-5. Click **Deploy**. Vercel will build the React frontend and deploy the Python serverless function at `/api`.
+5. Click **Deploy**. Vercel builds both services: the React frontend is served at `/`, and Django handles `/api`, `/django-admin`, `/static`, and `/media`.
 
 ### Option 2: Decoupled Deployment
 
