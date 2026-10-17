@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 
 class Category(models.TextChoices):
@@ -84,6 +86,17 @@ class ChallengeFile(models.Model):
 
     def __str__(self) -> str:
         return f"{self.challenge.name} - {self.original_name or self.file.name}"
+
+
+@receiver(post_delete, sender=ChallengeFile)
+def _delete_challenge_file_from_storage(sender, instance, **kwargs):
+    """Remove the stored file (e.g. Vercel Blob object) when its record is deleted.
+
+    Django does not delete files from storage automatically, so this also covers
+    cascade deletes when the parent Challenge is removed.
+    """
+    if instance.file:
+        instance.file.storage.delete(instance.file.name)
 
 
 class Submission(models.Model):
