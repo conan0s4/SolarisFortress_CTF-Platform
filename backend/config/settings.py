@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -11,7 +12,7 @@ PROJECT_ROOT = BASE_DIR.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-secret-key-solaris-fortress-ctf")
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 
 # Allowed hosts
 _raw_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
@@ -99,6 +100,15 @@ else:
             "PORT": os.environ.get("DB_PORT", "5432"),
         }
     }
+
+# Vercel's serverless filesystem is read-only, so SQLite cannot be used there.
+# Fail with a clear message instead of the cryptic "unable to open database file".
+if os.environ.get("VERCEL") and not DATABASE_URL:
+    raise ImproperlyConfigured(
+        "DATABASE_URL is required on Vercel. SQLite cannot persist on the "
+        "serverless filesystem. Provision a PostgreSQL database (e.g. Neon via "
+        "Vercel Storage) and set the DATABASE_URL environment variable."
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
